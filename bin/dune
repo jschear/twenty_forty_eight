@@ -1,0 +1,5 @@
+(executable
+ (public_name twenty_forty_eight)
+ (name main)
+ (libraries twenty_forty_eight unix)
+ (modes byte exe))
