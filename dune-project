@@ -19,7 +19,8 @@
  (name twenty_forty_eight)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml dune)
+ (depends ocaml dune bonsai virtual_dom ppx_css ppx_jane)
+ (allow_empty true)
  (tags
   (topics "to describe" your project)))
 

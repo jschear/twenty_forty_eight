@@ -1,5 +1,6 @@
 (executable
- (public_name twenty_forty_eight)
  (name main)
- (libraries twenty_forty_eight unix)
- (modes byte exe))
+ (libraries bonsai bonsai.web virtual_dom.keyboard game)
+ (preprocess
+  (pps js_of_ocaml-ppx ppx_css ppx_jane))
+ (modes js))

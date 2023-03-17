@@ -1,2 +1,4 @@
 (library
- (name twenty_forty_eight))
+ (name game)
+ (preprocess
+  (pps ppx_jane)))

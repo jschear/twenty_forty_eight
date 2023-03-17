@@ -12,6 +12,10 @@ bug-reports: "https://github.com/username/reponame/issues"
 depends: [
   "ocaml"
   "dune" {>= "3.7"}
+  "bonsai"
+  "virtual_dom"
+  "ppx_css"
+  "ppx_jane"
   "odoc" {with-doc}
 ]
 build: [
