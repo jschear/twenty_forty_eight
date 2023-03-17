@@ -21,3 +21,8 @@ make serve
 # Build the JavaScript and copy it into public/
 make run
 ```
+
+## Running tests
+```sh
+dune runtest
+```

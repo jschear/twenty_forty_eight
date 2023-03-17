@@ -2,6 +2,7 @@ open Sexplib.Std
 open Ppx_compare_lib.Builtin
 
 (* TODO: make a lot of this less mutation-y *)
+(* TODO: organize some of this into a module? *)
 
 type key_t = Up | Down | Left | Right [@@deriving equal, sexp]
 
@@ -14,15 +15,6 @@ type board_t = int array array [@@deriving sexp, equal]
 (* 2048 board size *)
 let size = 4
 let new_board () = Array.make_matrix size size 0
-
-(* 2048 board printing *)
-let print_board board =
-  print_endline "----------------";
-  let print_row row =
-    Array.iter (fun x -> Printf.printf "%4d" x) row;
-    print_newline ()
-  in
-  Array.iter print_row board
 
 let find_open_positions board =
   let open_positions = ref [] in
@@ -67,12 +59,6 @@ let board_equals left right =
     true
   with NotEqual -> false
 
-let board_from_list tiles = List.map Array.of_list tiles |> Array.of_list
-
-let test_board =
-  [ [ 2; 0; 0; 0 ]; [ 4; 0; 0; 0 ]; [ 6; 0; 0; 0 ]; [ 8; 0; 0; 0 ] ]
-  |> board_from_list
-
 let rotate_right board =
   let result = new_board () in
   for i = 0 to size - 1 do
@@ -96,77 +82,6 @@ let shift_left board =
     done
   done;
   result
-
-let assert_equal expected actual =
-  let result = board_equals expected actual in
-  let print_failure () =
-    Printf.printf "Expected:\n";
-    print_board expected;
-    Printf.printf "Actual:\n";
-    print_board actual
-  in
-  let () = if not result then print_failure () in
-  assert result
-
-(* TODO: move these into a test file *)
-let () =
-  assert_equal
-    (board_from_list
-       [ [ 8; 6; 4; 2 ]; [ 0; 0; 0; 0 ]; [ 0; 0; 0; 0 ]; [ 0; 0; 0; 0 ] ])
-    (rotate_right test_board)
-
-let () =
-  assert_equal
-    (board_from_list
-       [ [ 2; 0; 0; 0 ]; [ 4; 0; 0; 0 ]; [ 6; 0; 0; 0 ]; [ 8; 0; 0; 0 ] ])
-    (board_from_list
-       [ [ 2; 0; 0; 0 ]; [ 4; 0; 0; 0 ]; [ 6; 0; 0; 0 ]; [ 8; 0; 0; 0 ] ]
-    |> shift_left)
-
-let () =
-  assert_equal
-    (board_from_list
-       [ [ 2; 0; 0; 0 ]; [ 4; 0; 0; 0 ]; [ 6; 0; 0; 0 ]; [ 8; 0; 0; 0 ] ])
-    (board_from_list
-       [ [ 0; 2; 0; 0 ]; [ 0; 4; 0; 0 ]; [ 0; 6; 0; 0 ]; [ 0; 8; 0; 0 ] ]
-    |> shift_left)
-
-let () =
-  assert_equal
-    (board_from_list
-       [ [ 4; 0; 0; 0 ]; [ 8; 0; 0; 0 ]; [ 16; 0; 0; 0 ]; [ 32; 0; 0; 0 ] ])
-    (board_from_list
-       [ [ 2; 2; 0; 0 ]; [ 4; 4; 0; 0 ]; [ 8; 8; 0; 0 ]; [ 16; 16; 0; 0 ] ]
-    |> shift_left)
-
-let () =
-  assert_equal
-    (board_from_list
-       [ [ 4; 2; 0; 0 ]; [ 8; 4; 0; 0 ]; [ 16; 8; 0; 0 ]; [ 32; 16; 0; 0 ] ])
-    (board_from_list
-       [ [ 2; 2; 2; 0 ]; [ 4; 4; 4; 0 ]; [ 8; 8; 8; 0 ]; [ 16; 16; 16; 0 ] ]
-    |> shift_left)
-
-let () =
-  assert_equal
-    (board_from_list
-       [ [ 4; 0; 0; 0 ]; [ 4; 4; 0; 0 ]; [ 16; 16; 0; 0 ]; [ 0; 0; 0; 0 ] ])
-    (board_from_list
-       [ [ 2; 0; 0; 2 ]; [ 4; 0; 2; 2 ]; [ 8; 8; 8; 8 ]; [ 0; 0; 0; 0 ] ]
-    |> shift_left)
-
-(* TODO: fix this. *)
-(* let () = assert_equal(board_from_list [
-     [4; 0; 0; 0];
-     [4; 4; 0; 0];
-     [16; 16; 0; 0];
-     [0; 0; 0; 0];
-   ]) (board_from_list [
-     [2; 0; 0; 2];
-     [4; 0; 2; 2];
-     [8; 8; 16; 0];
-     [0; 0; 0; 0];
-   ] |> shift_left) *)
 
 let move direction board =
   match direction with

@@ -1,2 +1,3 @@
 (test
- (name game))
+ (name game)
+ (libraries twenty_forty_eight))

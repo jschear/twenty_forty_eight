@@ -2,6 +2,7 @@ open! Core
 open! Bonsai_web
 open Bonsai.Let_syntax
 open Vdom_keyboard
+open Twenty_forty_eight
 module Js = Js_of_ocaml.Js
 module Command = Keyboard_event_handler.Command
 

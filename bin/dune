@@ -1,6 +1,6 @@
 (executable
  (name main)
- (libraries bonsai bonsai.web virtual_dom.keyboard game)
+ (libraries bonsai bonsai.web virtual_dom.keyboard twenty_forty_eight)
  (preprocess
   (pps js_of_ocaml-ppx ppx_css ppx_jane))
  (modes js))
