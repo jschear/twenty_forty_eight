@@ -1,6 +1,11 @@
 (executable
  (name main)
- (libraries bonsai bonsai.web virtual_dom.keyboard twenty_forty_eight)
+ (libraries
+  bonsai
+  bonsai.web
+  virtual_dom.keyboard
+  twenty_forty_eight
+  ppx_css.inline_css)
  (preprocess
   (pps js_of_ocaml-ppx ppx_css ppx_jane))
  (modes js))

@@ -6,11 +6,12 @@ open Ppx_compare_lib.Builtin
 
 type key_t = Up | Down | Left | Right [@@deriving equal, sexp]
 
-(* Define a game over exception *)
-exception GameOver of int
-
 (* 2048 board type *)
 type board_t = int array array [@@deriving sexp, equal]
+type status_t = Playing | GameOver of int [@@deriving sexp, equal]
+
+type game_state = { board : board_t; status : status_t }
+[@@deriving sexp, equal]
 
 (* 2048 board size *)
 let size = 4
@@ -35,19 +36,16 @@ let score_board board =
 
 let place_random_tile board =
   let open_positions = find_open_positions board in
-  if List.length open_positions = 0 then raise (GameOver (score_board board));
   let idx = Random.int (List.length open_positions) in
   let i, j = List.nth open_positions idx in
   let tile = get_random_tile () in
   board.(i).(j) <- tile
 
-let initial_board () =
+let initial_state () =
   let board = new_board () in
   place_random_tile board;
   place_random_tile board;
-  board
-
-exception NotEqual
+  { board; status = Playing }
 
 let rotate_right board =
   let result = new_board () in
@@ -94,11 +92,11 @@ let check_game_over board =
          not (equal_board_t new_board board))
        [ Up; Down; Left; Right ])
 
-let handler key board =
-  if check_game_over board then raise (GameOver (score_board board));
+let handler key { board; status } =
   let new_board = move key board in
-
-  if equal_board_t new_board board then board
-  else (
-    place_random_tile new_board;
-    new_board)
+  if equal_board_t new_board board then { board; status }
+  else
+    let () = place_random_tile new_board in
+    if check_game_over new_board then
+      { board = new_board; status = GameOver (score_board new_board) }
+    else { board = new_board; status }
