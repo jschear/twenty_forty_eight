@@ -26,3 +26,8 @@ make run
 ```sh
 dune runtest
 ```
+
+## TODO
+- Change game state representation to include ending the game. (Get rid of the GameOver exception.)
+- Build a real UI instead of using a simple sexp.
+- Animations!
