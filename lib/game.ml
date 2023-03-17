@@ -49,16 +49,6 @@ let initial_board () =
 
 exception NotEqual
 
-let board_equals left right =
-  try
-    for i = 0 to size - 1 do
-      for j = 0 to size - 1 do
-        if left.(i).(j) <> right.(i).(j) then raise NotEqual
-      done
-    done;
-    true
-  with NotEqual -> false
-
 let rotate_right board =
   let result = new_board () in
   for i = 0 to size - 1 do
@@ -101,14 +91,14 @@ let check_game_over board =
     (List.exists
        (fun direction ->
          let new_board = move direction board in
-         not (board_equals new_board board))
+         not (equal_board_t new_board board))
        [ Up; Down; Left; Right ])
 
 let handler key board =
   if check_game_over board then raise (GameOver (score_board board));
   let new_board = move key board in
 
-  if board_equals new_board board then board
+  if equal_board_t new_board board then board
   else (
     place_random_tile new_board;
     new_board)

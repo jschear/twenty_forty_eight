@@ -18,7 +18,7 @@ let print_board board =
   Array.iter print_row board
 
 let assert_equal expected actual =
-  let result = Game.board_equals expected actual in
+  let result = Game.equal_board_t expected actual in
   let print_failure () =
     Printf.printf "Expected:\n";
     print_board expected;
