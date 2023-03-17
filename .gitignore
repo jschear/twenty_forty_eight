@@ -4,4 +4,4 @@ _opam/
 
 .DS_Store
 
-bin/main.bc.js
+public/main.bc.js

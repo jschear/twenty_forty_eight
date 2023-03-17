@@ -15,5 +15,8 @@ opam install . --deps-only
 
 ## Running
 ```sh
+# Start an HTTP server for bin/
+make serve
+
 make run
 ```
