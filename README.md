@@ -15,8 +15,9 @@ opam install . --deps-only
 
 ## Running
 ```sh
-# Start an HTTP server for bin/
+# Start an HTTP server for public/
 make serve
 
+# Build the JavaScript and copy it into public/
 make run
 ```
