@@ -3,6 +3,10 @@
 
 ## Dev environment
 ```sh
+# Prereq: install opam
+# On macOS, homebrew works:
+# brew install opam
+
 # Create a local switch for this project
 opam switch create . 4.14.1
 
@@ -28,6 +32,4 @@ dune runtest
 ```
 
 ## TODO
-- Change game state representation to include ending the game. (Get rid of the GameOver exception.)
-- Build a real UI instead of using a simple sexp.
 - Animations!
