@@ -10,8 +10,14 @@ module Style =
 [%css.raw
 {|
   .grid {
-    width: 500px;
-    height: 500px;
+    font-family: 'Montserrat', sans-serif;
+    width: 250px;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    background: linear-gradient(to bottom right, #FFC371, #FF5F6D);
+    border-radius: 8px;
   }
 
   .row {
@@ -23,11 +29,21 @@ module Style =
     width: 50px;
     height: 50px;
     margin: auto;
+    background-color: #FFB347;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    drop-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  }
+
+  .content {
+    text-align: center;
   }
 |}]
 
 module Action = struct
-  type t = Game.key [@@deriving equal, sexp]
+  type t = Restart | GameAction of Game.key [@@deriving equal, sexp]
 end
 
 module Model = struct
@@ -43,28 +59,28 @@ let handle_event inject =
             [ Keystroke.create' Js_of_ocaml.Dom_html.Keyboard_code.ArrowDown ];
           description = "arrow-down";
           group = None;
-          handler = (fun _ -> inject Game.Down);
+          handler = (fun _ -> inject (Action.GameAction Game.Down));
         };
         {
           Command.keys =
             [ Keystroke.create' Js_of_ocaml.Dom_html.Keyboard_code.ArrowUp ];
           description = "arrow-up";
           group = None;
-          handler = (fun _ -> inject Game.Up);
+          handler = (fun _ -> inject (Action.GameAction Game.Up));
         };
         {
           Command.keys =
             [ Keystroke.create' Js_of_ocaml.Dom_html.Keyboard_code.ArrowLeft ];
           description = "arrow-left";
           group = None;
-          handler = (fun _ -> inject Game.Left);
+          handler = (fun _ -> inject (Action.GameAction Game.Left));
         };
         {
           Command.keys =
             [ Keystroke.create' Js_of_ocaml.Dom_html.Keyboard_code.ArrowRight ];
           description = "arrow-right";
           group = None;
-          handler = (fun _ -> inject Game.Right);
+          handler = (fun _ -> inject (Action.GameAction Game.Right));
         };
       ]
   in
@@ -73,16 +89,26 @@ let handle_event inject =
     | Some event -> event
     | None -> Vdom.Effect.Ignore
 
-let render (model : int array array) =
-  Array.map model ~f:(fun row ->
-      let dom_row =
-        Array.map row ~f:(fun x ->
-            Vdom.Node.div
-              ~attr:(Vdom.Attr.class_ Style.cell)
-              [ Vdom.Node.text (Int.to_string x) ])
-      in
-      Vdom.Node.div ~attr:(Vdom.Attr.class_ Style.row) (Array.to_list dom_row))
-  |> Array.to_list
+let render_cell cell =
+  Vdom.Node.div
+    ~attr:(Vdom.Attr.class_ Style.cell)
+    [
+      Vdom.Node.div
+        ~attr:(Vdom.Attr.class_ Style.content)
+        (match cell with
+        | 0 -> []
+        | _ -> [ Vdom.Node.text (Int.to_string cell) ]);
+    ]
+
+let render_row row =
+  Vdom.Node.div
+    ~attr:(Vdom.Attr.class_ Style.row)
+    (Array.map row ~f:(fun cell -> render_cell cell) |> Array.to_list)
+
+let render_board board =
+  Vdom.Node.div
+    ~attr:(Vdom.Attr.class_ Style.grid)
+    (Array.map board ~f:(fun row -> render_row row) |> Array.to_list)
 
 let component =
   let%sub model_and_inject =
@@ -91,23 +117,34 @@ let component =
       (module Action)
       ~default_model:(Game.initial_state ())
       ~apply_action:(fun ~inject:_ ~schedule_event:_ model action ->
-        Game.handler action model)
+        match action with
+        | Restart -> Game.initial_state ()
+        | GameAction action -> Game.handler action model)
   in
   let%arr model, inject = model_and_inject in
   Vdom.Node.div
-    ~attr:
-      (Vdom.Attr.many
-         [
-           Vdom.Attr.class_ Style.grid;
-           Vdom.Attr.on_keydown (handle_event inject);
-         ])
-    (List.append (render model.board)
-       [
-         Vdom.Node.text
-           (match model.status with
-           | Game.Playing -> "Playing!"
-           | Game.GameOver score -> "Game Over! Score: " ^ Int.to_string score);
-       ])
+    ~attr:(Vdom.Attr.on_keydown (handle_event inject))
+    [
+      render_board model.board;
+      Vdom.Node.div
+        ~attr:
+          (Vdom.Attr.style
+             (match model.status with
+             | Game.Playing -> Css_gen.color (`Name "black")
+             | Game.GameOver _ -> Css_gen.color (`Name "red")))
+        [
+          Vdom.Node.text
+            (match model.status with
+            | Game.Playing -> "Playing!"
+            | Game.GameOver score -> "Game Over! Score: " ^ Int.to_string score);
+        ];
+      Vdom.Node.div
+        [
+          Vdom.Node.button
+            ~attr:(Vdom.Attr.on_click (fun _ -> inject Restart))
+            [ Vdom.Node.text "Restart" ];
+        ];
+    ]
 
 let (_ : _ Start.Handle.t) =
   Start.start Start.Result_spec.just_the_view ~bind_to_element_with_id:"app"
