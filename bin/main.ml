@@ -27,7 +27,7 @@ module Style =
 |}]
 
 module Action = struct
-  type t = Game.key_t [@@deriving equal, sexp]
+  type t = Game.key [@@deriving equal, sexp]
 end
 
 module Model = struct

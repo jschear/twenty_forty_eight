@@ -1,30 +1,20 @@
 open Sexplib.Std
 open Ppx_compare_lib.Builtin
 
-(* TODO: make a lot of this less mutation-y *)
+(* TODO: make a lot of this less mutation-y? *)
 (* TODO: organize some of this into a module? *)
 
-type key_t = Up | Down | Left | Right [@@deriving equal, sexp]
+type key = Up | Down | Left | Right [@@deriving equal, sexp]
+type board = int array array [@@deriving sexp, equal]
+type status = Playing | GameOver of int [@@deriving sexp, equal]
+type game_state = { board : board; status : status } [@@deriving sexp, equal]
 
-(* 2048 board type *)
-type board_t = int array array [@@deriving sexp, equal]
-type status_t = Playing | GameOver of int [@@deriving sexp, equal]
-
-type game_state = { board : board_t; status : status_t }
-[@@deriving sexp, equal]
-
-(* 2048 board size *)
 let size = 4
 let new_board () = Array.make_matrix size size 0
 
 let find_open_positions board =
-  let open_positions = ref [] in
-  for i = 0 to size - 1 do
-    for j = 0 to size - 1 do
-      if board.(i).(j) = 0 then open_positions := (i, j) :: !open_positions
-    done
-  done;
-  !open_positions
+  let indices = List.init size (fun i -> List.init size (fun j -> (i, j))) in
+  List.filter (fun (i, j) -> board.(i).(j) = 0) (List.concat indices)
 
 let get_random_tile () =
   let r = Random.int 10 in
@@ -89,12 +79,12 @@ let check_game_over board =
     (List.exists
        (fun direction ->
          let new_board = move direction board in
-         not (equal_board_t new_board board))
+         not (equal_board new_board board))
        [ Up; Down; Left; Right ])
 
 let handler key { board; status } =
   let new_board = move key board in
-  if equal_board_t new_board board then { board; status }
+  if equal_board new_board board then { board; status }
   else
     let () = place_random_tile new_board in
     if check_game_over new_board then
