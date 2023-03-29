@@ -7,14 +7,11 @@
 # On macOS, homebrew works:
 # brew install opam
 
-# Create a local switch for this project
-opam switch create . 4.14.1
+# Create a local switch for this project, install dependencies
+opam switch create . 4.14.1 --deps-only
 
-# Install tooling deps, lsp
-opam install ocamlformat ocaml-lsp-server dune
-
-# Install dependencies
-opam install . --deps-only
+# Install lsp and formatter if necessary
+opam install ocamlformat ocaml-lsp-server
 ```
 
 ## Running
