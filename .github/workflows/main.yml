@@ -1,4 +1,7 @@
 name: "Test"
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 on:
   pull_request:
 jobs:
@@ -9,9 +12,14 @@ jobs:
     - uses: cachix/install-nix-action@v25
       with:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Install Vercel CLI
+      run: npm install --global vercel@latest
+    - name: Pull Vercel Environment Information
+      run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
     - run: nix develop -c ci/build.sh
     - uses: actions/upload-artifact@v4
       with:
         name: main.bc.js
         path: _build/default/bin/main.bc.js
+    - run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
 

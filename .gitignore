@@ -6,3 +6,4 @@ _opam/
 .DS_Store
 
 public/main.bc.js
+.vercel
