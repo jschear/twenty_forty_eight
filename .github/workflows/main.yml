@@ -1,7 +1,6 @@
 name: "Test"
 on:
   pull_request:
-  push:
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -10,10 +9,7 @@ jobs:
     - uses: cachix/install-nix-action@v25
       with:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
-    - run: |
-      nix develop
-      opam switch create . --deps-only --locked
-      dune build bin/main.bc.js
+    - run: nix develop -c ci/build.sh
     - uses: actions/upload-artifact@v4
       with:
         name: main.bc.js
