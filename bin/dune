@@ -7,5 +7,5 @@
   twenty_forty_eight
   ppx_css.inline_css)
  (preprocess
-  (pps js_of_ocaml-ppx ppx_css ppx_jane))
+  (pps js_of_ocaml-ppx ppx_css ppx_jane bonsai.ppx_bonsai))
  (modes js))

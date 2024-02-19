@@ -7,12 +7,14 @@
 # On macOS, homebrew works:
 # brew install opam
 
-# Create a local switch for this project, install dependencies
-opam switch create . 4.14.1 --deps-only
+# Create a local switch for this project, install dependencies from lockfile
+opam switch create . --deps-only --locked
 
-# Install lsp and formatter if necessary
+# Install lsp and formatter for use in editor
 opam install ocamlformat ocaml-lsp-server
 ```
+
+Alternatively, there's a nix flake that includes opam and system dependencies. `nix develop` will drop you into a shell with the system deps installed. Then run the same steps above to install ocaml deps.
 
 ## Running
 ```sh

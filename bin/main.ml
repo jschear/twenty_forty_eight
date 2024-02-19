@@ -7,8 +7,9 @@ module Js = Js_of_ocaml.Js
 module Command = Keyboard_event_handler.Command
 
 module Style =
-[%css.raw
-{|
+  [%css
+  stylesheet
+    {|
   .grid {
     font-family: 'Montserrat', sans-serif;
     width: 250px;
@@ -90,29 +91,25 @@ let handle_event inject =
     | None -> Vdom.Effect.Ignore
 
 let render_cell cell =
-  Vdom.Node.div
-    ~attr:(Vdom.Attr.class_ Style.cell)
+  Vdom.Node.div ~attrs:[ Style.cell ]
     [
-      Vdom.Node.div
-        ~attr:(Vdom.Attr.class_ Style.content)
+      Vdom.Node.div ~attrs:[ Style.content ]
         (match cell with
         | 0 -> []
         | _ -> [ Vdom.Node.text (Int.to_string cell) ]);
     ]
 
 let render_row row =
-  Vdom.Node.div
-    ~attr:(Vdom.Attr.class_ Style.row)
+  Vdom.Node.div ~attrs:[ Style.row ]
     (Array.map row ~f:(fun cell -> render_cell cell) |> Array.to_list)
 
 let render_board board =
-  Vdom.Node.div
-    ~attr:(Vdom.Attr.class_ Style.grid)
+  Vdom.Node.div ~attrs:[ Style.grid ]
     (Array.map board ~f:(fun row -> render_row row) |> Array.to_list)
 
 let component =
   let%sub model_and_inject =
-    Bonsai.state_machine0 [%here]
+    Bonsai.state_machine0
       (module Model)
       (module Action)
       ~default_model:(Game.initial_state ())
@@ -123,15 +120,17 @@ let component =
   in
   let%arr model, inject = model_and_inject in
   Vdom.Node.div
-    ~attr:(Vdom.Attr.on_keydown (handle_event inject))
+    ~attrs:[ Vdom.Attr.on_keydown (handle_event inject) ]
     [
       render_board model.board;
       Vdom.Node.div
-        ~attr:
-          (Vdom.Attr.style
-             (match model.status with
-             | Game.Playing -> Css_gen.color (`Name "black")
-             | Game.GameOver _ -> Css_gen.color (`Name "red")))
+        ~attrs:
+          [
+            Vdom.Attr.style
+              (match model.status with
+              | Game.Playing -> Css_gen.color (`Name "black")
+              | Game.GameOver _ -> Css_gen.color (`Name "red"));
+          ]
         [
           Vdom.Node.text
             (match model.status with
@@ -141,11 +140,9 @@ let component =
       Vdom.Node.div
         [
           Vdom.Node.button
-            ~attr:(Vdom.Attr.on_click (fun _ -> inject Restart))
+            ~attrs:[ Vdom.Attr.on_click (fun _ -> inject Restart) ]
             [ Vdom.Node.text "Restart" ];
         ];
     ]
 
-let (_ : _ Start.Handle.t) =
-  Start.start Start.Result_spec.just_the_view ~bind_to_element_with_id:"app"
-    component
+let () = Start.start ~bind_to_element_with_id:"app" component
