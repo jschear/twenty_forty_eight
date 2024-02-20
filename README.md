@@ -1,5 +1,7 @@
 # twenty_forty_eight
-2048 in OCaml, running in the browser with [bonsai](https://github.com/janestreet/bonsai).
+2048 in OCaml, running in the browser with [bonsai](https://github.com/janestreet/bonsai). Arrow keys control the game.
+
+Game logic is in [lib/game.ml](lib/game.ml), bonsai code is in [bin/main.ml](bin/main.ml).
 
 ## Dev environment
 ```sh
@@ -31,4 +33,5 @@ dune runtest
 ```
 
 ## TODO
-- Animations!
+- Animations
+- Gesture controls for mobile
